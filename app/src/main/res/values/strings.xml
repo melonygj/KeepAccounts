@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">记账本</string>
+    <string name="home">首页</string>
+    <string name="accounts">账户</string>
+    <string name="debts">借贷</string>
+    <string name="profile">我的</string>
+    <string name="add_transaction">记一笔</string>
+    <string name="income">收入</string>
+    <string name="expense">支出</string>
+    <string name="transfer">转账</string>
+    <string name="total_assets">总资产</string>
+    <string name="monthly_income">本月收入</string>
+    <string name="monthly_expense">本月支出</string>
+</resources>
