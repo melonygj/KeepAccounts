@@ -1,9 +1,9 @@
 package com.example.keepaccounts.data.database
 
 import androidx.room.*
-import com.example.keepaccounts.data.model.Category
-import com.example.keepaccounts.data.model.TransactionType
+import com.example.keepaccounts.data.model.*
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 @Dao
 interface CategoryDao {
@@ -51,12 +51,6 @@ interface TransactionDao {
     
     @Query("SELECT * FROM transactions WHERE date BETWEEN :startTime AND :endTime ORDER BY date DESC")
     fun getByDateRange(startTime: Long, endTime: Long): Flow<List<Transaction>>
-    
-    @Query("SELECT * FROM transactions WHERE accountId = :accountId ORDER BY date DESC")
-    fun getByAccount(accountId: Long): Flow<List<Transaction>>
-    
-    @Query("SELECT * FROM transactions WHERE categoryId = :categoryId ORDER BY date DESC")
-    fun getByCategory(categoryId: Long): Flow<List<Transaction>>
     
     @Insert
     suspend fun insert(transaction: Transaction): Long

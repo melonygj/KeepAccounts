@@ -22,7 +22,7 @@ class Converters {
 
     @TypeConverter
     fun toTransactionType(value: String): TransactionType {
-        return TransactionType.valueOf(value)
+        return try { TransactionType.valueOf(value) } catch (e: Exception) { TransactionType.EXPENSE }
     }
 
     @TypeConverter
@@ -32,7 +32,7 @@ class Converters {
 
     @TypeConverter
     fun toAccountType(value: String): AccountType {
-        return AccountType.valueOf(value)
+        return try { AccountType.valueOf(value) } catch (e: Exception) { AccountType.CASH }
     }
 
     @TypeConverter
@@ -42,7 +42,7 @@ class Converters {
 
     @TypeConverter
     fun toBudgetPeriod(value: String): BudgetPeriod {
-        return BudgetPeriod.valueOf(value)
+        return try { BudgetPeriod.valueOf(value) } catch (e: Exception) { BudgetPeriod.MONTHLY }
     }
 
     @TypeConverter
@@ -52,6 +52,6 @@ class Converters {
 
     @TypeConverter
     fun toDebtType(value: String): DebtType {
-        return DebtType.valueOf(value)
+        return try { DebtType.valueOf(value) } catch (e: Exception) { DebtType.BORROW }
     }
 }
