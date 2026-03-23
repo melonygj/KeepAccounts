@@ -14,16 +14,19 @@ class AccountRepository {
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories
     
+    private var nextAccountId = 1L
+    private var nextTransactionId = 1L
+    
     init {
         initializeDefaultData()
     }
     
     fun addAccount(account: Account) {
-        _accounts.value = _accounts.value + account.copy(id = (_accounts.value.maxOfOrNull { it.id } ?: 0) + 1)
+        _accounts.value = _accounts.value + account.copy(id = nextAccountId++)
     }
     
     fun addTransaction(transaction: Transaction) {
-        _transactions.value = _transactions.value + transaction.copy(id = (_transactions.maxOfOrNull { it.id } ?: 0) + 1)
+        _transactions.value = _transactions.value + transaction.copy(id = nextTransactionId++)
     }
     
     fun getMonthlyTotal(type: String): Double {
@@ -40,6 +43,7 @@ class AccountRepository {
             Account(2, "支付宝", 5000.0, "📱"),
             Account(3, "微信", 3000.0, "💚")
         )
+        nextAccountId = 4
         
         _categories.value = listOf(
             Category(1, "餐饮", "expense", "🍽️"),
@@ -54,5 +58,6 @@ class AccountRepository {
             Transaction(2, "expense", 15.0, "交通", "微信", "地铁", System.currentTimeMillis() - 7200000),
             Transaction(3, "income", 10000.0, "工资", "银行卡", "月薪", System.currentTimeMillis() - 86400000)
         )
+        nextTransactionId = 4
     }
 }
