@@ -42,7 +42,6 @@ fun HomeScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // 总资产卡片
             item {
                 Card(
                     modifier = Modifier
@@ -79,7 +78,6 @@ fun HomeScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 }
             }
             
-            // 快捷操作
             item {
                 Row(
                     modifier = Modifier
@@ -90,11 +88,9 @@ fun HomeScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                     QuickAction(icon = Icons.Default.Add, label = "记一笔") { }
                     QuickAction(icon = Icons.Default.AccountBalanceWallet, label = "账户") { }
                     QuickAction(icon = Icons.Default.PieChart, label = "报表") { }
-                    QuickAction(icon = Icons.Default.Savings, label = "预算") { }
                 }
             }
             
-            // 最近交易
             item {
                 Text(
                     "最近交易",
@@ -125,7 +121,7 @@ fun QuickAction(icon: androidx.compose.ui.graphics.vector.ImageVector, label: St
 }
 
 @Composable
-fun TransactionItem(transaction: com.example.keepaccounts.data.model.Transaction) {
+fun TransactionItem(transaction: Transaction) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -138,20 +134,25 @@ fun TransactionItem(transaction: com.example.keepaccounts.data.model.Transaction
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(transaction.note ?: "交易记录", style = MaterialTheme.typography.titleMedium)
+                Text(transaction.categoryName, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    transaction.note ?: transaction.accountName,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Text(
                     SimpleDateFormat("MM-dd HH:mm").format(transaction.date),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Text(
-                text = if (transaction.type == com.example.keepaccounts.data.model.TransactionType.INCOME) 
+                text = if (transaction.type == TransactionType.INCOME) 
                     "+%.2f".format(transaction.amount) 
                 else 
                     "-%.2f".format(transaction.amount),
                 style = MaterialTheme.typography.titleMedium,
-                color = if (transaction.type == com.example.keepaccounts.data.model.TransactionType.INCOME) 
+                color = if (transaction.type == TransactionType.INCOME) 
                     com.example.keepaccounts.ui.theme.IncomeColor 
                 else 
                     com.example.keepaccounts.ui.theme.ExpenseColor

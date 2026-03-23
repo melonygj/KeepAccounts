@@ -28,7 +28,6 @@ class MainActivity : ComponentActivity() {
                     factory = MainViewModelFactory(database)
                 )
                 
-                // 初始化默认数据
                 LaunchedEffect(Unit) {
                     viewModel.initializeData()
                 }
@@ -61,12 +60,6 @@ fun MainScreen(viewModel: MainViewModel) {
                 NavigationBarItem(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
-                    icon = { Icon(Icons.Default.Savings, contentDescription = null) },
-                    label = { Text("借贷") }
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 3,
-                    onClick = { selectedTab = 3 },
                     icon = { Icon(Icons.Default.Person, contentDescription = null) },
                     label = { Text("我的") }
                 )
@@ -76,8 +69,7 @@ fun MainScreen(viewModel: MainViewModel) {
         when (selectedTab) {
             0 -> HomeScreen(viewModel, Modifier.padding(paddingValues))
             1 -> AccountsScreen(viewModel, Modifier.padding(paddingValues))
-            2 -> DebtScreen(viewModel, Modifier.padding(paddingValues))
-            3 -> ProfileScreen(viewModel, Modifier.padding(paddingValues))
+            2 -> ProfileScreen(viewModel, Modifier.padding(paddingValues))
         }
     }
 }

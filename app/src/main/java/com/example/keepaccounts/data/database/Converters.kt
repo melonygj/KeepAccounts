@@ -24,34 +24,4 @@ class Converters {
     fun toTransactionType(value: String): TransactionType {
         return try { TransactionType.valueOf(value) } catch (e: Exception) { TransactionType.EXPENSE }
     }
-
-    @TypeConverter
-    fun fromAccountType(value: AccountType): String {
-        return value.name
-    }
-
-    @TypeConverter
-    fun toAccountType(value: String): AccountType {
-        return try { AccountType.valueOf(value) } catch (e: Exception) { AccountType.CASH }
-    }
-
-    @TypeConverter
-    fun fromBudgetPeriod(value: BudgetPeriod): String {
-        return value.name
-    }
-
-    @TypeConverter
-    fun toBudgetPeriod(value: String): BudgetPeriod {
-        return try { BudgetPeriod.valueOf(value) } catch (e: Exception) { BudgetPeriod.MONTHLY }
-    }
-
-    @TypeConverter
-    fun fromDebtType(value: DebtType): String {
-        return value.name
-    }
-
-    @TypeConverter
-    fun toDebtType(value: String): DebtType {
-        return try { DebtType.valueOf(value) } catch (e: Exception) { DebtType.BORROW }
-    }
 }

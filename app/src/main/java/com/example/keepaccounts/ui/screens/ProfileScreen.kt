@@ -28,7 +28,6 @@ fun ProfileScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // 用户信息卡片
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -52,7 +51,6 @@ fun ProfileScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 }
             }
             
-            // 设置项
             Text("设置", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
             
             SettingItem(
@@ -62,18 +60,6 @@ fun ProfileScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 trailing = {
                     Switch(checked = darkMode, onCheckedChange = { darkMode = it })
                 }
-            )
-            
-            SettingItem(
-                icon = Icons.Default.Notifications,
-                title = "通知提醒",
-                subtitle = "账单提醒、预算预警"
-            )
-            
-            SettingItem(
-                icon = Icons.Default.Backup,
-                title = "数据备份",
-                subtitle = "云端同步、本地备份"
             )
             
             SettingItem(

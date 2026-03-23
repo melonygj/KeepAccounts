@@ -12,17 +12,12 @@ import java.util.Calendar
 
 class MainViewModel(private val repository: AccountRepository) : ViewModel() {
     
-    // UI 状态
-    private val _selectedTab = MutableStateFlow(0)
-    val selectedTab: StateFlow<Int> = _selectedTab
-    
     private val _selectedYear = MutableStateFlow(Calendar.getInstance().get(Calendar.YEAR))
     val selectedYear: StateFlow<Int> = _selectedYear
     
     private val _selectedMonth = MutableStateFlow(Calendar.getInstance().get(Calendar.MONTH) + 1)
     val selectedMonth: StateFlow<Int> = _selectedMonth
     
-    // 数据流
     val accounts: StateFlow<List<Account>> = repository.getAllAccounts()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     
@@ -35,38 +30,21 @@ class MainViewModel(private val repository: AccountRepository) : ViewModel() {
     val incomeCategories: StateFlow<List<Category>> = repository.getCategoriesByType(TransactionType.INCOME)
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     
-    val budgets: StateFlow<List<Budget>> = repository.getAllBudgets()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-    
-    val debts: StateFlow<List<Debt>> = repository.getActiveDebts()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-    
-    // 统计数据
-    val monthlyIncome: StateFlow<Double> = combine(_selectedYear, _selectedMonth) { year, month ->
-        repository.getMonthlyIncome(year, month).first() ?: 0.0
+    val monthlyIncome: StateFlow<Double> = _selectedMonth.flatMapLatest { month ->
+        _selectedYear.flatMapLatest { year ->
+            repository.getMonthlyIncome(year, month).map { it ?: 0.0 }
+        }
     }.stateIn(viewModelScope, SharingStarted.Lazily, 0.0)
     
-    val monthlyExpense: StateFlow<Double> = combine(_selectedYear, _selectedMonth) { year, month ->
-        repository.getMonthlyExpense(year, month).first() ?: 0.0
+    val monthlyExpense: StateFlow<Double> = _selectedMonth.flatMapLatest { month ->
+        _selectedYear.flatMapLatest { year ->
+            repository.getMonthlyExpense(year, month).map { it ?: 0.0 }
+        }
     }.stateIn(viewModelScope, SharingStarted.Lazily, 0.0)
     
-    // 总资产
     val totalAssets: StateFlow<Double> = accounts.map { list ->
-        list.filter { it.includeInTotal }.sumOf { it.balance }
+        list.sumOf { it.balance }
     }.stateIn(viewModelScope, SharingStarted.Lazily, 0.0)
-    
-    // 操作方法
-    fun setSelectedTab(tab: Int) {
-        _selectedTab.value = tab
-    }
-    
-    fun setSelectedYear(year: Int) {
-        _selectedYear.value = year
-    }
-    
-    fun setSelectedMonth(month: Int) {
-        _selectedMonth.value = month
-    }
     
     fun addTransaction(transaction: Transaction) {
         viewModelScope.launch {
@@ -86,27 +64,9 @@ class MainViewModel(private val repository: AccountRepository) : ViewModel() {
         }
     }
     
-    fun deleteAccount(account: Account) {
-        viewModelScope.launch {
-            repository.deleteAccount(account)
-        }
-    }
-    
     fun addCategory(category: Category) {
         viewModelScope.launch {
             repository.addCategory(category)
-        }
-    }
-    
-    fun addBudget(budget: Budget) {
-        viewModelScope.launch {
-            repository.addBudget(budget)
-        }
-    }
-    
-    fun addDebt(debt: Debt) {
-        viewModelScope.launch {
-            repository.addDebt(debt)
         }
     }
     

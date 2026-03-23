@@ -8,14 +8,7 @@ import androidx.room.TypeConverters
 import com.example.keepaccounts.data.model.*
 
 @Database(
-    entities = [
-        Category::class,
-        Account::class,
-        Transaction::class,
-        Budget::class,
-        Debt::class,
-        Repayment::class
-    ],
+    entities = [Category::class, Account::class, Transaction::class],
     version = 1,
     exportSchema = false
 )
@@ -24,8 +17,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun accountDao(): AccountDao
     abstract fun transactionDao(): TransactionDao
-    abstract fun budgetDao(): BudgetDao
-    abstract fun debtDao(): DebtDao
 
     companion object {
         @Volatile
