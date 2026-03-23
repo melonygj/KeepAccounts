@@ -10,28 +10,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.keepaccounts.data.database.AppDatabase
 import com.example.keepaccounts.ui.screens.*
 import com.example.keepaccounts.ui.theme.KeepAccountsTheme
 import com.example.keepaccounts.viewmodel.MainViewModel
-import com.example.keepaccounts.viewmodel.MainViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        val database = AppDatabase.getDatabase(applicationContext)
-        
         setContent {
             KeepAccountsTheme {
-                val viewModel: MainViewModel = viewModel(
-                    factory = MainViewModelFactory(database)
-                )
-                
-                LaunchedEffect(Unit) {
-                    viewModel.initializeData()
-                }
-                
+                val viewModel: MainViewModel = viewModel()
                 MainScreen(viewModel)
             }
         }
@@ -45,31 +33,19 @@ fun MainScreen(viewModel: MainViewModel) {
     Scaffold(
         bottomBar = {
             NavigationBar {
-                NavigationBarItem(
-                    selected = selectedTab == 0,
-                    onClick = { selectedTab = 0 },
-                    icon = { Icon(Icons.Default.Home, contentDescription = null) },
-                    label = { Text("首页") }
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 1,
-                    onClick = { selectedTab = 1 },
-                    icon = { Icon(Icons.Default.AccountBalanceWallet, contentDescription = null) },
-                    label = { Text("账户") }
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 2,
-                    onClick = { selectedTab = 2 },
-                    icon = { Icon(Icons.Default.Person, contentDescription = null) },
-                    label = { Text("我的") }
-                )
+                NavigationBarItem(selected = selectedTab == 0, onClick = { selectedTab = 0 },
+                    icon = { Icon(Icons.Default.Home, null) }, label = { Text("首页") })
+                NavigationBarItem(selected = selectedTab == 1, onClick = { selectedTab = 1 },
+                    icon = { Icon(Icons.Default.AccountBalanceWallet, null) }, label = { Text("账户") })
+                NavigationBarItem(selected = selectedTab == 2, onClick = { selectedTab = 2 },
+                    icon = { Icon(Icons.Default.Person, null) }, label = { Text("我的") })
             }
         }
-    ) { paddingValues ->
+    ) { padding ->
         when (selectedTab) {
-            0 -> HomeScreen(viewModel, Modifier.padding(paddingValues))
-            1 -> AccountsScreen(viewModel, Modifier.padding(paddingValues))
-            2 -> ProfileScreen(viewModel, Modifier.padding(paddingValues))
+            0 -> HomeScreen(viewModel, Modifier.padding(padding))
+            1 -> AccountsScreen(viewModel, Modifier.padding(padding))
+            2 -> ProfileScreen(viewModel, Modifier.padding(padding))
         }
     }
 }

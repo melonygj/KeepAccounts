@@ -1,78 +1,58 @@
 package com.example.keepaccounts.data.repository
 
-import com.example.keepaccounts.data.database.*
 import com.example.keepaccounts.data.model.*
-import kotlinx.coroutines.flow.Flow
-import java.util.Calendar
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-class AccountRepository(private val database: AppDatabase) {
-    private val accountDao = database.accountDao()
-    private val transactionDao = database.transactionDao()
-    private val categoryDao = database.categoryDao()
+class AccountRepository {
+    private val _accounts = MutableStateFlow<List<Account>>(emptyList())
+    val accounts: StateFlow<List<Account>> = _accounts
     
-    fun getAllAccounts(): Flow<List<Account>> = accountDao.getAll()
+    private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
+    val transactions: StateFlow<List<Transaction>> = _transactions
     
-    suspend fun addAccount(account: Account): Long = accountDao.insert(account)
+    private val _categories = MutableStateFlow<List<Category>>(emptyList())
+    val categories: StateFlow<List<Category>> = _categories
     
-    fun getAllTransactions(): Flow<List<Transaction>> = transactionDao.getAll()
-    
-    fun getTransactionsByMonth(year: Int, month: Int): Flow<List<Transaction>> {
-        val calendar = Calendar.getInstance()
-        calendar.set(year, month - 1, 1, 0, 0, 0)
-        val startTime = calendar.timeInMillis
-        calendar.add(Calendar.MONTH, 1)
-        val endTime = calendar.timeInMillis
-        return transactionDao.getByDateRange(startTime, endTime)
+    init {
+        initializeDefaultData()
     }
     
-    suspend fun addTransaction(transaction: Transaction): Long = transactionDao.insert(transaction)
-    
-    suspend fun deleteTransaction(transaction: Transaction) = transactionDao.delete(transaction)
-    
-    fun getMonthlyIncome(year: Int, month: Int): Flow<Double?> {
-        val calendar = Calendar.getInstance()
-        calendar.set(year, month - 1, 1, 0, 0, 0)
-        val startTime = calendar.timeInMillis
-        calendar.add(Calendar.MONTH, 1)
-        val endTime = calendar.timeInMillis
-        return transactionDao.getTotalByType(TransactionType.INCOME, startTime, endTime)
+    fun addAccount(account: Account) {
+        _accounts.value = _accounts.value + account.copy(id = (_accounts.value.maxOfOrNull { it.id } ?: 0) + 1)
     }
     
-    fun getMonthlyExpense(year: Int, month: Int): Flow<Double?> {
-        val calendar = Calendar.getInstance()
-        calendar.set(year, month - 1, 1, 0, 0, 0)
-        val startTime = calendar.timeInMillis
-        calendar.add(Calendar.MONTH, 1)
-        val endTime = calendar.timeInMillis
-        return transactionDao.getTotalByType(TransactionType.EXPENSE, startTime, endTime)
+    fun addTransaction(transaction: Transaction) {
+        _transactions.value = _transactions.value + transaction.copy(id = (_transactions.maxOfOrNull { it.id } ?: 0) + 1)
     }
     
-    fun getCategoriesByType(type: TransactionType): Flow<List<Category>> = categoryDao.getByType(type)
+    fun getMonthlyTotal(type: String): Double {
+        val now = System.currentTimeMillis()
+        val monthStart = now - (now % (30L * 24 * 60 * 60 * 1000))
+        return _transactions.value
+            .filter { it.type == type && it.date >= monthStart }
+            .sumOf { it.amount }
+    }
     
-    fun getAllCategories(): Flow<List<Category>> = categoryDao.getAll()
-    
-    suspend fun addCategory(category: Category): Long = categoryDao.insert(category)
-    
-    suspend fun deleteCategory(category: Category) = categoryDao.delete(category)
-    
-    suspend fun initializeDefaultData() {
-        val defaultCategories = listOf(
-            Category(name = "餐饮", type = TransactionType.EXPENSE, icon = "🍽️", color = "#FF6B6B"),
-            Category(name = "交通", type = TransactionType.EXPENSE, icon = "🚗", color = "#4ECDC4"),
-            Category(name = "购物", type = TransactionType.EXPENSE, icon = "🛒", color = "#45B7D1"),
-            Category(name = "娱乐", type = TransactionType.EXPENSE, icon = "🎮", color = "#96CEB4"),
-            Category(name = "其他支出", type = TransactionType.EXPENSE, icon = "📦", color = "#85C1E9"),
-            Category(name = "工资", type = TransactionType.INCOME, icon = "💰", color = "#58D68D"),
-            Category(name = "奖金", type = TransactionType.INCOME, icon = "🎁", color = "#F4D03F"),
-            Category(name = "其他收入", type = TransactionType.INCOME, icon = "💵", color = "#85C1E9")
+    private fun initializeDefaultData() {
+        _accounts.value = listOf(
+            Account(1, "现金", 1000.0, "💵"),
+            Account(2, "支付宝", 5000.0, "📱"),
+            Account(3, "微信", 3000.0, "💚")
         )
-        defaultCategories.forEach { categoryDao.insert(it) }
         
-        val defaultAccounts = listOf(
-            Account(name = "现金", icon = "💵"),
-            Account(name = "支付宝", icon = "📱"),
-            Account(name = "微信", icon = "💚")
+        _categories.value = listOf(
+            Category(1, "餐饮", "expense", "🍽️"),
+            Category(2, "交通", "expense", "🚗"),
+            Category(3, "购物", "expense", "🛒"),
+            Category(4, "工资", "income", "💰"),
+            Category(5, "奖金", "income", "🎁")
         )
-        defaultAccounts.forEach { accountDao.insert(it) }
+        
+        _transactions.value = listOf(
+            Transaction(1, "expense", 35.0, "餐饮", "支付宝", "午餐", System.currentTimeMillis() - 3600000),
+            Transaction(2, "expense", 15.0, "交通", "微信", "地铁", System.currentTimeMillis() - 7200000),
+            Transaction(3, "income", 10000.0, "工资", "银行卡", "月薪", System.currentTimeMillis() - 86400000)
+        )
     }
 }
